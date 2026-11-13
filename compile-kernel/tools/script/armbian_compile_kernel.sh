@@ -724,6 +724,10 @@ compile_kernel() {
             INSTALL_MOD_DIR="kernel/drivers/net/wireless/rtl8189fs" \
             modules_install \
             || error_msg "RTL8189FS module installation failed."
+        echo -e "${STEPS} Updating RTL8189FS module dependencies..."
+
+        depmod -a -b "${output_path}/modules" "${kernel_outname}" \
+            || error_msg "RTL8189FS depmod failed."
 
         echo -e "${SUCCESS} RTL8189FS module installed."
     else
