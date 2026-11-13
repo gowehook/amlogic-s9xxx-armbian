@@ -158,6 +158,17 @@ configure_and_compile() {
         docker restart ${docker_container} >/dev/null && sleep 5
     fi
 
+    # Use the armbian-kernel script shipped with this checked-out action.
+    # The Docker image contains its own copy under /usr/sbin, which may be an
+    # older upstream version and would otherwise overwrite/bypass fork hooks.
+    local_action_script="${current_path}/build-armbian/armbian-files/common-files/usr/sbin/armbian-kernel"
+    [[ -f "${local_action_script}" ]] || error_msg "Action armbian-kernel script not found: ${local_action_script}"
+
+    echo -e "${INFO} Installing this action's armbian-kernel script into Docker container..."
+    docker cp "${local_action_script}" "${docker_container}:${docker_script}" \
+        || error_msg "Failed to copy the action armbian-kernel script into Docker container."
+    docker exec -i "${docker_container}" chmod +x "${docker_script}"
+
     echo -e "${INFO} Syncing scripts in Docker container..."
     docker exec -i "${docker_container}" bash "${docker_script}" -u
 
