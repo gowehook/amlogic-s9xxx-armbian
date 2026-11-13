@@ -704,6 +704,32 @@ compile_kernel() {
         kernel_outname="${real_kver}"
     fi
 
+    # Build and install custom RTL8189FS SDIO module
+    RTL8189FS_SRC="${compile_path}/custom-modules/rtl8189fs/source"
+
+    if [[ -d "${RTL8189FS_SRC}" ]]; then
+        echo -e "${STEPS} Building custom RTL8189FS module..."
+
+        make ${silent_print} -C "${kernel_path}/${local_kernel_path}" \
+            M="${RTL8189FS_SRC}" ${MAKE_SET_STRING} \
+            CC="${CC}" LD="${LD}" modules \
+            || error_msg "RTL8189FS module compilation failed."
+
+        echo -e "${STEPS} Installing RTL8189FS module..."
+
+        make ${silent_print} -C "${kernel_path}/${local_kernel_path}" \
+            M="${RTL8189FS_SRC}" ${MAKE_SET_STRING} \
+            CC="${CC}" LD="${LD}" \
+            INSTALL_MOD_PATH="${output_path}/modules" \
+            INSTALL_MOD_DIR="kernel/drivers/net/wireless/rtl8189fs" \
+            modules_install \
+            || error_msg "RTL8189FS module installation failed."
+
+        echo -e "${SUCCESS} RTL8189FS module installed."
+    else
+        echo -e "${INFO} RTL8189FS source not found. Skipping custom module."
+    fi
+
     # Strip debug information
     STRIP="${CROSS_COMPILE}strip"
     if find ${output_path}/modules -name "*.ko" -print0 | xargs -0 "${STRIP}" --strip-debug 2>/dev/null; then

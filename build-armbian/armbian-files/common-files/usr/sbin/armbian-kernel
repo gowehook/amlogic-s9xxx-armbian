@@ -36,7 +36,7 @@ script_name="${script_path}/armbian_compile_kernel.sh"
 arch_info="$(arch)"
 
 # The kernel compilation scripts download repository
-script_repo="https://github.com/ophub/amlogic-s9xxx-armbian.git"
+script_repo="https://github.com/gowehook/amlogic-s9xxx-armbian.git"
 script_dir="compile-kernel"
 
 # Set font color
@@ -79,7 +79,7 @@ update_script() {
     pull_ok="0"
     pull_delay="5"
     for pull_try in 1 2 3; do
-        if timeout 180 git pull --quiet --depth=1 origin main; then
+        if timeout 180 git pull --quiet --depth=1 origin rtl8189fs-hook; then
             pull_ok="1"
             break
         fi
